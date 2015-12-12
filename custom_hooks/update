@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+
+import urllib.request
+import json
+import re
+import os
+import sys
+import subprocess
+import gitlab_acl
+
+def get_private_token():
+    return 'add_root_user_private_token_here'
+
+def do_curl(url):
+    s = ''
+    try:
+        with urllib.request.urlopen(url) as f:
+            s += f.read(1024).decode('utf-8')
+    except urllib.error.HTTPError as err:
+        return None
+    return s
+
+def get_username_by_user_id(user_id):
+    url = 'http://127.0.0.1/api/v3/users/' + str(user_id) + '?private_token=' + get_private_token()
+    response = do_curl(url)
+
+    if response is None:
+        return None
+
+    user_info = json.loads(response)
+    return user_info['username']
+
+def get_username_by_key_id(key_id):
+    url = 'http://127.0.0.1/api/v3/keys/' + str(key_id) + '?private_token=' + get_private_token()
+    response = do_curl(url)
+
+    if response is None:
+        return None
+
+    user_info = json.loads(response)['user']
+    return user_info['username']
+
+def get_username_from_GL_ID():
+    s = os.environ['GL_ID']
+    m = re.match('key-(\d+)', s)
+    if m:
+        return get_username_by_key_id(m.group(1))
+    else:
+        m = re.match('user-(\d+)', s)
+        if m:
+            return get_username_by_user_id(m.group(1))
+    return None
+
+def get_git_file_list(ref_name, old_rev, new_rev):
+    t = subprocess.check_output(['git', 'diff', '--name-only', '-z', '--format=', ref_name + '..' + new_rev])
+    tmp_list = t.split(b'\0')
+    file_list = []
+    for e in tmp_list:
+        if len(e) == 0:
+            continue
+        file_list.append(e.decode('utf-8'))
+    return file_list
+
+def main():
+    ref_name  = sys.argv[1]
+    old_rev   = sys.argv[2]
+    new_rev   = sys.argv[3]
+    user_name = get_username_from_GL_ID()
+    if user_name in gitlab_acl.acl_dict:
+        acl = gitlab_acl.acl_dict[user_name]
+        if ('default' not in acl) or acl['default'] == 'deny':
+            pattern_list = acl['pass_pattern'].split('|')
+            file_list = get_git_file_list(ref_name, old_rev, new_rev)
+
+            for file_name in file_list:
+                ok = False
+                for pattern in pattern_list:
+                    if re.search(pattern, file_name):
+                        ok = True
+                        break
+                if not ok:
+                    sys.exit(1)
+    else:
+        sys.exit(1)
+    sys.exit(0)
+
+if __name__ == '__main__':
+    main()
