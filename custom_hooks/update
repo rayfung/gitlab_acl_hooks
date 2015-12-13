@@ -68,7 +68,10 @@ def apply_pass_rules(acl, ref_name, old_rev, new_rev):
             sys.exit(1)
 
 def apply_deny_rules(acl, ref_name, old_rev, new_rev):
-    pass
+    file_list = get_git_file_list(ref_name, old_rev, new_rev)
+    for file_name in file_list:
+        if re.search(acl['deny_pattern'], file_name):
+            sys.exit(1)
 
 def main():
     ref_name  = sys.argv[1]
