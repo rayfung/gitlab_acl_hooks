@@ -9,7 +9,7 @@ import subprocess
 import gitlab_acl
 
 def get_private_token():
-    return 'add_root_user_private_token_here'
+    return gitlab_acl.private_token
 
 def do_curl(url):
     s = ''

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
+private_token = 'put_your_token_here'
 acl_dict = dict()
-acl_dict['rayfung'] = dict(default='pass')
-acl_dict['guotao']  = dict(default='pass')
-acl_dict['hui']     = dict(default='deny', pass_pattern=r'^Assets/Effects_Enemy/.+|^Assets/Models/Character/.+\.fbx\.meta$')
+
+# Example rules
+#
+# acl_dict['zhangsan'] = dict(default='pass')
+# acl_dict['lisi']     = dict(default='deny', pass_pattern=r'^doc/')
+# acl_dict['wangwu']   = dict(default='deny', pass_pattern=r'.+\.psd$|.+\.fbx$')
