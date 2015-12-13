@@ -52,7 +52,7 @@ def get_username_from_GL_ID():
     return None
 
 def get_git_file_list(ref_name, old_rev, new_rev):
-    t = subprocess.check_output(['git', 'diff', '--name-only', '-z', '--format=', ref_name + '..' + new_rev])
+    t = subprocess.check_output(['git', 'diff', '--name-only', '-z', '--format=', ref_name + '..' + new_rev, '--'])
     tmp_list = t.split(b'\0')
     file_list = []
     for e in tmp_list:
