@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 private_token = 'put_your_token_here'
+config = dict()
+config['ignore_case'] = True
 acl_dict = dict()
 
 # Example rules
