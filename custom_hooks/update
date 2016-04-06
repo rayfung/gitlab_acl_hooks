@@ -97,6 +97,10 @@ def main():
     ref_name  = sys.argv[1]
     old_rev   = sys.argv[2]
     new_rev   = sys.argv[3]
+
+    if ref_name in gitlab_acl.unprotect_set:
+        sys.exit(0)
+
     user_name = get_username_from_GL_ID()
     if user_name in gitlab_acl.acl_dict:
         acl = gitlab_acl.acl_dict[user_name]

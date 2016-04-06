@@ -3,6 +3,7 @@
 private_token = 'put_your_token_here'
 config = dict()
 config['ignore_case'] = True
+unprotect_set = set()
 acl_dict = dict()
 
 # Example rules
